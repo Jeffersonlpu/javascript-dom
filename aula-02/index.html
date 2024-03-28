@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Mega Sena</h1>
+    <p>Números:</p>
+    <span class="resultado"></span>
+
+    <hr />
+    <p>Números digitados:</p>
+    <input style="width: 40px" type="number" />
+    <input style="width: 40px" type="number" />
+    <input style="width: 40px" type="number" />
+    <input style="width: 40px" type="number" />
+    <input style="width: 40px" type="number" />
+    <input style="width: 40px" type="number" />
+    <br />
+    <br />
+    <div>
+      <button onclick="gerarNumeros()">Gerar Números</button>
+    </div>
+  </body>
+  <script>
+    const numerosMegaSena = 6;
+
+    function gerarNumeroEntreUmESessenta() {
+      return Math.floor(Math.random() * 60) + 1;
+    }
+
+    function gerarTodosOsnumeros() {
+      const numeros = [];
+      for (let i = 0; i < numerosMegaSena; i++) {
+        let numero = gerarNumeroEntreUmESessenta();
+        while (numeros.includes(numero)) {
+          numero = gerarNumeroEntreUmESessenta();
+        }
+        numeros.push(numero);
+      }
+      numeros.sort((a, b) => a - b);
+
+      return numeros.join(" -> ");
+    }
+
+    function gerarNumeros() {
+      const numerosGerados = gerarTodosOsnumeros();
+
+      const elResultado = document.querySelector(".resultado");
+      elResultado.textContent = numerosGerados;
+    }
+  </script>
+</html>

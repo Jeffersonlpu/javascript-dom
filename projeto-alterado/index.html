@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Churrascômetro</title>
+    <style>
+      table,
+      th,
+      td {
+        border: 1px solid;
+      }
+
+      table {
+        border-collapse: collapse;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="step1">
+      <h2>Passo 1: Informações do Usuário</h2>
+      <form id="userInfoForm">
+        <label for="name">Nome:</label><br />
+        <input type="text" id="name" required /><br />
+        <label for="email">E-mail:</label><br />
+        <input type="email" id="email" required /><br />
+        <label for="cep">CEP:</label><br />
+        <input type="text" id="cep" required /><br />
+        <input type="checkbox" id="receivePromotions" checked />
+        <label for="receivePromotions"
+          >Aceito receber e-mails com promoções</label
+        ><br />
+        <button id="btnNext">Próximo</button>
+      </form>
+    </div>
+
+    <div id="step2" style="display: none">
+      <h2>Passo 2: Quantidade de Pessoas</h2>
+
+      <div id="userInfo"></div>
+
+      <form id="peopleInfoForm">
+        <label for="adults">Adultos (Homens):</label><br />
+        <input type="number" id="adults" min="0" value="0" required /><br />
+        <label for="women">Mulheres/Adultos:</label><br />
+        <input type="number" id="women" min="0" value="0" required /><br />
+        <label for="children">Crianças:</label><br />
+        <input type="number" id="children" min="0" value="0" required /><br />
+        <label for="drinkers">Pessoas que bebem bebidas alcoólicas:</label
+        ><br />
+        <input type="number" id="drinkers" min="0" value="0" required /><br />
+        <button id="btnNext2">Calcular</button>
+      </form>
+    </div>
+
+    <div id="step3" style="display: none">
+      <h2>Passo 3: Resultado do Cálculo</h2>
+      <table id="resultTable"></table>
+    </div>
+
+    <script>
+      const inputValues = {};
+
+      const inputName = document.getElementById("name");
+      const inputEmail = document.getElementById("email");
+      const inputCep = document.getElementById("cep");
+      const receivePromotions = document.getElementById("receivePromotions");
+      const btnNext = document.getElementById("btnNext");
+      const btnNext2 = document.getElementById("btnNext2");
+
+      function getUserSessionStorage() {
+        const userSetted = sessionStorage.getItem("userSetted");
+        if (userSetted === "true") {
+          goToNextStep(document.getElementById("step1"));
+        }
+      }
+
+      getUserSessionStorage();
+
+      btnNext.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const nameValue = inputName.value.trim();
+        const emailValue = inputEmail.value.trim();
+        const cepValue = inputCep.value.trim();
+        const receivePromotionsValue = receivePromotions.checked;
+
+        if (
+          validateUserInfo(
+            nameValue,
+            emailValue,
+            cepValue,
+            receivePromotionsValue
+          )
+        ) {
+          inputValues.name = nameValue;
+          inputValues.email = emailValue;
+          inputValues.cep = cepValue;
+          inputValues.receivePromotions = receivePromotionsValue;
+
+          const userInfoDiv = document.getElementById("userInfo");
+          userInfoDiv.innerHTML = `
+          <p>Olá, ${inputValues.name}!</p>
+          <p> Você ${
+            inputValues.receivePromotions ? "" : "não"
+          } optou por aderir a nossa lista de promoções no e-mail: ${
+            inputValues.email
+          }</p>
+          <p>Preencha os campos abaixo para gerar a lista de sua festa:</p>
+          
+        `;
+
+          goToNextStep(document.getElementById("step1"));
+        }
+
+        sessionStorage.setItem("userSetted", "true");
+      });
+
+      btnNext2.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const adultsValue = parseInt(document.getElementById("adults").value);
+        const womenValue = parseInt(document.getElementById("women").value);
+        const childrenValue = parseInt(
+          document.getElementById("children").value
+        );
+        const drinkersValue = parseInt(
+          document.getElementById("drinkers").value
+        );
+
+        calculateResults(adultsValue, womenValue, childrenValue, drinkersValue);
+
+        goToNextStep(document.getElementById("step2"));
+      });
+
+      function validateUserInfo(nameValue, emailValue, cepValue) {
+        if (nameValue === "" || emailValue === "" || cepValue === "") {
+          alert("Por favor, preencha todos os campos obrigatórios.");
+          return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailValue)) {
+          alert("Por favor, insira um e-mail válido.");
+          return false;
+        }
+
+        if (isNaN(cepValue)) {
+          alert("O campo CEP deve conter apenas números.");
+          return;
+        }
+
+        resetInputValues();
+
+        return true;
+      }
+
+      function resetInputValues() {
+        inputName.value = "";
+        inputEmail.value = "";
+        inputCep.value = "";
+      }
+
+      function goToNextStep(currentStep) {
+        currentStep.style.display = "none";
+        const nextStep = currentStep.nextElementSibling;
+        if (nextStep) {
+          nextStep.style.display = "block";
+        }
+      }
+
+      function calculateResults(adults, women, children, drinkers) {
+        const resultTable = document.getElementById("resultTable");
+
+        const meat = 0.4 * adults + 0.32 * women + 0.2 * children;
+        const garlicBread = 2 * adults + 1 * children;
+        const charcoal = adults + women + children + drinkers;
+        const salt = 0.04 * (adults + women + children);
+        const ice = drinkers > 0 ? 5 : 0;
+        const soda = Math.ceil((adults + women + children) / 5);
+        const water = Math.ceil((adults + women + children) / 5);
+        const beer = 3 * drinkers;
+
+        resultTable.innerHTML = `
+          <tr><td>Carne </td><td>${meat.toFixed(2)} KG</td></tr>
+          <tr><td>Pão de alho </td><td>${garlicBread}</td></tr>
+          <tr><td>Carvão </td><td>${charcoal} KG</td></tr>
+          <tr><td>Sal </td><td>${salt.toFixed(2)} KG</td></tr>
+          <tr><td>Gelo </td><td>${ice} KG</td></tr>
+          <tr><td>Refrigerante </td><td>${soda} garrafa(s) de 2L</td></tr>
+          <tr><td>Água </td><td>${water} garrafa(s) de 1L</td></tr>
+          <tr><td>Cerveja </td><td>${beer} garrafas de 600ml</td></tr>
+        `;
+      }
+    </script>
+  </body>
+</html>

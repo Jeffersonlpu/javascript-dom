@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>Lista de Compras</h1>
+    <hr />
+
+    <input type="text" placeholder="Produto" id="produto" />
+    <br /><br />
+    <input type="text" placeholder="Valor" id="valor" />
+    <br /><br />
+    <input type="text" placeholder="Imagem" id="imagem" />
+    <br /><br />
+    <button id="btnAdicionarProduto">Adicionar Produto</button>
+
+    <hr />
+
+    <h2>Lista de Produtos</h2>
+
+    <div id="listaProdutos">
+      <div id="produto_1" style="display: inline-block">
+        <img
+          width="200px"
+          height="200px"
+          src="https://www.infoescola.com/wp-content/uploads/2010/04/banana_600797891.jpg"
+          alt=""
+        />
+        <div id="descricao_produto_1" style="text-align: center">
+          Banana - R$ 10,00 - <button>Remover</button>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <script>
+    const btnAdicionarProduto = document.getElementById("btnAdicionarProduto");
+
+    btnAdicionarProduto.addEventListener("click", () => {
+      const elProduto = document.getElementById("produto");
+      const elValor = document.getElementById("valor");
+      const elImagem = document.getElementById("imagem");
+
+      const produto = elProduto.value;
+      const valor = elValor.value;
+      const imagem = elImagem.value;
+
+      const listaProdutos = document.getElementById("listaProdutos");
+      const id = listaProdutos.children.length + 1;
+      const produtoId = `produto_${id}`;
+
+      const divProduto = document.createElement("div");
+      divProduto.setAttribute("style", "display: inline-block");
+      divProduto.setAttribute("id", produtoId);
+
+      const idBtnRemover = `btnRemover_${id}`;
+
+      divProduto.innerHTML = `
+      <img
+          width="200px"
+          height="200px"
+          src="${imagem}"
+          alt=""
+        />
+        <div id="descricao_produto_${id}">
+          ${produto} - R$ ${valor} - <button id="${idBtnRemover}">Remover</button>
+        </div>`;
+
+      listaProdutos.appendChild(divProduto);
+
+      //após a criação do botão
+      document.getElementById(idBtnRemover);
+
+      //resetan os valores
+      elProduto.value = "";
+      elValor.value = "";
+      elImagem.value = "";
+
+      const btnRemoverProduto = document.getElementById(idBtnRemover);
+      btnRemoverProduto.addEventListener("click", () => {
+        document.getElementById(produtoId).remove();
+      });
+    });
+
+    document.getElementById("valor").addEventListener("change", (e) => {
+      const value = document.getElementById("valor").value;
+      //somente funciona quando clica fora do input
+    console.log("Novo valor", value);
+    });
+  </script>
+</html>
